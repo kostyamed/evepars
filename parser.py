@@ -19,6 +19,8 @@ def search(ids):
 	driver.get((str(url)+str(ids)))
 	driver.implicitly_wait(config.delay)
 
+	# divs = driver.find_elements(By.TAG_NAME, "div")
+
 	item_name_div = driver.find_element(By.CLASS_NAME, "item-name")
 	item_name_h = item_name_div.find_element(By.TAG_NAME, "h2")
 	name = item_name_h.text
@@ -34,8 +36,8 @@ def search(ids):
 		insert_in_base(ids, name, type_text)
 		print(str(ids) + " | " + str(name) + " | " + str(type_text))
 
-	driver.quit()
-	db.close()
+	# driver.quit()
+	# db.close()
 
 def is_in_base(ids):
 	for row in cur.execute("SELECT * FROM items"):
@@ -44,12 +46,13 @@ def is_in_base(ids):
 	return False
 
 def insert_in_base(ids, name, types):
-	cur.execute("INSERT INTO items VALUES (" + str(ids) + ",'" + str(name) + "','" + str(types) + "')")
+	query = """INSERT INTO items VALUES (?,?,?)"""
+	cur.execute(query, ([ids, name, types]))
 	db.commit()
 	
 
 if __name__ == "__main__":
-	with open(sys.argv[1], newline='') as f:
+	with open(sys.argv[1], newline='', encoding='utf-8') as f:
 		reader = csv.reader(f)
 		for row in reader:
 			search(row[0])
